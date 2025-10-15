@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* Optional inline styles for sidebar highlighting */
+    .sidebar nav a.active {
+      background-color: #007bff;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <aside class="sidebar" id="sidebar">
+      <h2>Inventory App</h2>
+      <nav>
+        <ul>
+          <li><a href="invoice.html" target="main-frame">Invoice</a></li>
+          <li><a href="dashboard-content.html" target="main-frame">Dashboard</a></li>
+          <li><a href="add-product.html" target="main-frame">Add Product</a></li>
+          <li><a href="sales.html" target="main-frame">Sales</a></li>
+          <li><a href="parties.html" target="main-frame">Parties</a></li>
+        </ul>
+      </nav>
+      <div class="sidebar-logout">
+        <button id="logoutBtn">Logout</button>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <!-- Loading overlay (optional) -->
+      <div id="loadingOverlay" class="loading-overlay">
+        <div class="spinner"></div>
+      </div>
+
+      <!-- Iframe for content -->
+      <iframe id="contentFrame" src="dashboard-content.html" name="main-frame"></iframe>
+    </main>
+  </div>
+
+  <script>
+  // Sidebar links & iframe
+  const iframe = document.getElementById('contentFrame');
+  const links = document.querySelectorAll('.sidebar nav a');
+
+  // Load last iframe page from localStorage
+  const lastIframePage = localStorage.getItem('lastIframePage');
+  if (lastIframePage) {
+    iframe.src = lastIframePage;
+  }
+
+  // Highlight active link
+  function highlightLink(href) {
+    links.forEach(link => link.classList.remove('active'));
+    const activeLink = document.querySelector(`.sidebar nav a[href="${href}"]`);
+    if (activeLink) activeLink.classList.add('active');
+  }
+
+  // Update iframe and localStorage on click
+  links.forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      const href = link.getAttribute('href');
+      iframe.src = href;
+      localStorage.setItem('lastIframePage', href);
+      highlightLink(href);
+    });
+  });
+
+  // Highlight on load
+  highlightLink(iframe.src.split("/").pop());
+
+  // Logout
+  document.getElementById('logoutBtn').addEventListener('click', () => {
+    localStorage.removeItem('userEmail');
+    localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('lastIframePage');
+    window.location.href = 'login.html';
+  });
+  </script>
+</body>
+</html>

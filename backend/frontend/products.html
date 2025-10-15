@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Product List</title>
+</head>
+<body>
+  <h1>Product List</h1>
+  <table border="1">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Code</th>
+        <th>Price</th>
+        <th>Quantity</th>
+        <th>Supplier</th>
+        <th>Image</th>
+      </tr>
+    </thead>
+    <tbody id="productTableBody"></tbody>
+  </table>
+
+  <script>
+    async function loadProducts() {
+      const response = await fetch('http://localhost:3000/api/products');
+      const products = await response.json();
+
+      const tableBody = document.getElementById('productTableBody');
+      tableBody.innerHTML = '';
+
+      products.forEach(product => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${product.name}</td>
+          <td>${product.code}</td>
+          <td>${product.price}</td>
+          <td>${product.quantity || ''}</td>
+          <td>${product.supplier || ''}</td>
+          <td>${product.image ? `<img src="${product.image}" width="50" />` : 'No image'}</td>
+        `;
+        tableBody.appendChild(row);
+      });
+    }
+
+
+    loadProducts();
+  </script>
+</body>
+</html>

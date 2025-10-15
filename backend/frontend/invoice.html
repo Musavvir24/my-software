@@ -1,0 +1,399 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Invoice</title>
+  <style>
+    /* minimal professional styles */
+    /* Base */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 24px;
+  background: #f4f7fb;
+  color: #123;
+}
+
+/* Page container */
+.page {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* Invoice header */
+.invoice-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  background: linear-gradient(90deg, #f0f7ff, #fff);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 10px 24px rgba(12, 30, 60, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.invoice-header:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 28px rgba(12, 30, 60, 0.12);
+}
+
+/* Company block */
+.company-block {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+
+.company-logo img {
+  width: 130px;
+  height: auto;
+  border-radius: 10px;
+  object-fit: contain;
+}
+
+.company-name {
+  font-size: 22px;
+  font-weight: 900;
+  color: #0b3b66;
+}
+
+.company-address {
+  font-size: 13px;
+  color: #5b6b78;
+  margin-top: 6px;
+  line-height: 1.4;
+}
+
+/* Invoice meta */
+.invoice-meta {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.meta-card {
+  background: #fff;
+  padding: 10px 14px;
+  border-radius: 10px;
+  min-width: 140px;
+  box-shadow: 0 4px 16px rgba(10, 30, 60, 0.04);
+  font-size: 13px;
+  font-weight: 600;
+  color: #0b3b66;
+}
+
+/* Controls */
+.controls {
+  margin: 14px 0;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+/* Tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 6px 24px rgba(10, 30, 60, 0.06);
+  font-size: 0.95rem;
+}
+
+th, td {
+  padding: 12px 14px;
+  border-bottom: 1px solid #e6eef7;
+  text-align: left;
+  vertical-align: middle;
+}
+
+th {
+  background: #f8faff;
+  font-weight: 700;
+  color: #0b3b66;
+}
+
+tr:nth-child(even) {
+  background: #fcfdff;
+}
+
+tr.daily-total-row td {
+  font-weight: bold;
+  background: #e3f2ff;
+  color: #0b6bff;
+}
+
+/* Summary box */
+.summary {
+  float: right;
+  width: 340px;
+  margin-top: 20px;
+  background: linear-gradient(180deg, #eaf6ff, #fff);
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: 0 10px 32px rgba(10, 30, 60, 0.05);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.amount-cell {
+  min-width: 100px;
+  text-align: right;
+  color: #0b3b66;
+  font-weight: 600;
+}
+
+/* Buttons */
+button {
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: 1px solid #d6e4f2;
+  background: #fff;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+button:hover {
+  background-color: #f0f7ff;
+  transform: translateY(-1px);
+}
+
+button.primary {
+  background: #0b6bff;
+  color: #fff;
+  border: none;
+}
+
+button.primary:hover {
+  background: #0851c0;
+}
+
+/* Inputs */
+input, textarea {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #e6eef7;
+  width: 100%;
+  box-sizing: border-box;
+  font-size: 14px;
+}
+
+/* Modals */
+.modal {
+  position: fixed;
+  left: 0; right: 0; top: 0; bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(10, 18, 30, 0.45);
+  z-index: 9999;
+}
+
+.modal-inner {
+  background: #fff;
+  padding: 22px;
+  border-radius: 12px;
+  width: 440px;
+  box-shadow: 0 24px 80px rgba(10, 20, 40, 0.3);
+  font-size: 14px;
+}
+
+/* Fields */
+.field {
+  margin-bottom: 10px;
+}
+
+/* Suggestions dropdown */
+.suggestions {
+  position: absolute;
+  z-index: 2000;
+  background: #fff;
+  border: 1px solid #e6eef7;
+  width: 100%;
+  max-height: 180px;
+  overflow: auto;
+  list-style: none;
+  margin: 0;
+  padding: 6px 0;
+  border-radius: 6px;
+}
+
+.suggestions li {
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.suggestions li:hover {
+  background: #f0f7ff;
+}
+
+/* Helpers */
+.clearfix::after {
+  content: "";
+  display: block;
+  clear: both;
+}
+
+.small {
+  width: 150px;
+  display: inline-block;
+  font-size: 13px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .invoice-header {
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .summary {
+    float: none;
+    width: 100%;
+    margin-top: 16px;
+  }
+
+  table, th, td {
+    font-size: 0.85rem;
+  }
+
+  button {
+    width: 100%;
+    margin-top: 8px;
+  }
+}
+
+  </style>
+</head>
+<body>
+<div class="page">
+  <header class="invoice-header">
+    <!-- Company details on the left -->
+    <div class="company-block">
+      <div id="companyLogoWrap" class="company-logo">
+        <img id="companyLogo" src="" alt="logo" style="display:none; max-height:60px;" />
+      </div>
+      <div>
+        <div id="companyName" class="company-name">Your Business Name</div>
+        <div id="companyAddress" class="company-address">
+          Address line 1<br/>City, Country
+        </div>
+        <div id="companyPhone" class="company-address">
+          Phone: 000-000-000
+        </div>
+      </div>
+    </div>
+
+    <!-- Invoice meta on the right -->
+    <div class="invoice-meta">
+      <div class="meta-card">
+        <div class="meta-label">Invoice #</div>
+        <div id="invoiceNumberDisplay" class="meta-value"></div>
+      </div>
+      <div class="meta-card">
+        <div class="meta-label">Date</div>
+        <div id="invoiceDateDisplay" class="meta-value"></div>
+      </div>
+      <div class="meta-card">
+        <div class="meta-label">Payment Terms (days)</div>
+        <div><input id="paymentTerms" class="small" type="number" min="0" value="0" /></div>
+      </div>
+      <div class="meta-card">
+        <div class="meta-label">Due</div>
+        <div id="dueDateDisplay" class="meta-value"></div>
+      </div>
+    </div>
+  </header>
+</div>
+
+
+    <!-- Controls -->
+    <!-- ... your existing HTML ... -->
+
+<!-- Controls -->
+<div class="controls" id="invoice-actions">
+  <button type="button" id="editProfileBtn">Edit Business Profile</button>
+  <button type="button" id="add-item-btn">+ Add Item</button>
+  <button type="button" id="scan-barcode-btn">Scan Barcode</button>
+  <button type="button" id="save-invoice-btn" class="primary">💾 Save Invoice</button> 
+</div>
+
+
+    <!-- Customer Info -->
+    <div class="invoice-header">
+      <label>Customer Name:</label>
+      <input type="text" id="customerName" placeholder="Enter customer name" />
+      <label>Customer Phone:</label>
+      <input type="text" id="customerPhone" placeholder="Enter phone number" />
+   
+
+
+    </div>
+
+    <!-- Invoice Table -->
+   <table aria-label="Invoice items">
+  <thead>
+    <tr>
+      <th style="width:32%;">Item</th>
+      <th style="width:10%;">Code</th>
+      <th style="width:8%;">Qty</th>
+      <th style="width:12%;">MRP</th>
+      <th style="width:10%;">Discount (%)</th>
+      <th style="width:10%;">CGST (%)</th>
+      <th style="width:10%;">SGST (%)</th>
+      <th style="width:10%;">Amount</th>
+      <th style="width:10%;">Product Code</th>
+      <th style="width:6%;">Act</th>
+    </tr>
+  </thead>
+  <tbody id="invoice-items"></tbody>
+</table>
+
+
+   <!-- Summary -->
+<div class="summary clearfix">
+  <div class="summary-row"><div>Subtotal</div><div id="subtotal" class="amount-cell">₹ 0.00</div></div>
+  <div class="summary-row"><div>Total Discount</div><div id="total-discount" class="amount-cell">₹ 0.00</div></div>
+  <div class="summary-row"><div>Total Tax</div><div id="total-tax" class="amount-cell">₹ 0.00</div></div>
+  <hr>
+  <div class="summary-row" style="font-size:1.05em;">
+    <div style="font-weight:800">Invoice Total</div>
+    <div id="grand-total" class="amount-cell" style="font-weight:800">₹ 0.00</div>
+  </div>
+</div>
+
+
+    <!-- Profile Modal -->
+    <div id="profileModal" class="modal" style="display:none;">
+      <div class="modal-inner">
+        <h3>Business Profile</h3>
+        <div class="field"><label>Business Name</label><input id="profile_name" type="text" /></div>
+        <div class="field"><label>Address</label><textarea id="profile_address" rows="3"></textarea></div>
+        <div class="field"><label>Phone</label><input id="profile_phone" type="text" /></div>
+<div class="field">
+  <label>Logo</label>
+  <input type="file" id="profile_logoFile" accept="image/*" />
+  <img id="profile_logoPreview" src="" style="max-height:60px; display:none; margin-top:5px;" />
+</div>        
+<div style="margin-top:10px;">
+          <button type="button" id="saveProfileBtn" class="primary">Save</button>
+          <button type="button" id="cancelProfileBtn">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/invoice.js"></script>
+
+
+</body>
+</html>

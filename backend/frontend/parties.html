@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Parties & Bills</title>
+  <link rel="stylesheet" href="css/parties.css" />
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <h1>Parties</h1>
+      
+    </header>
+
+    <section class="card">
+      <h2>Add Party</h2>
+      <form id="partyForm" class="grid">
+        <input id="partyName" name="partyName" placeholder="Party Name *" required />
+        <input id="partyNumber" name="partyNumber" placeholder="Party Number" />
+        <input id="partyGST" name="partyGST" placeholder="Party GST" />
+        <button type="submit" class="btn primary">Add Party</button>
+      </form>
+    </section>
+
+    <section class="card">
+      <div class="list-header">
+        <h2>All Parties</h2>
+        <input id="search" class="search" placeholder="Search parties..." />
+      </div>
+      <div id="partiesList" class="parties"></div>
+    </section>
+  </div>
+
+  <script src="js/parties.js"></script>
+</body>
+</html>

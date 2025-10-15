@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Dashboard Overview</title>
+  <link rel="stylesheet" href="css/dashboard.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+  
+  </style>
+</head>
+<body>
+
+<header class="dashboard-header">
+  <h1>Dashboard</h1>
+  <div class="user-section">
+  </div>
+</header>
+
+<section class="grid-cards">
+  <div class="card">
+    <h3>Revenue</h3>
+    <p id="revenue">₹ 0.00</p>
+  </div>
+  <div class="card">
+    <h3>Profit</h3>
+    <p id="profit">₹ 0.00</p>
+  </div>
+  <div class="card">
+    <h3>Inventory</h3>
+    <p id="inventory">0 items</p>
+  </div>
+  <div class="card">
+    <h3>Total Sales</h3>
+    <p id="salesCount">0</p>
+  </div>
+</section>
+
+<div class="chart-box">
+  <h3>Sales & Parties</h3>
+  <select id="chartRange">
+    <option value="7">Last 7 Days</option>
+    <option value="30" selected>Last 30 Days</option>
+    <option value="31" selected>Last 31 Days</option>
+    <option value="90">Last 90 Days</option>
+  </select>
+  <div style="position: relative; height: 300px; margin-top: 10px;">
+    <canvas id="salesPurchasesChart"></canvas>
+</div>
+
+<section class="flex-panels">
+  <div class="panel two-thirds">
+    <h2>Top Selling Products</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Sold</th>
+          <th>Remaining</th>
+          <th>Price</th>
+        </tr>
+      </thead>
+      <tbody id="top-selling-table"></tbody>
+    </table>
+  </div>
+
+  <div class="panel one-third">
+    <h2>Low Stock Alerts</h2>
+    <ul id="low-stock-list"></ul>
+  </div>
+</section>
+
+<script src="js/dashboard.js"></script>
+</body>
+</html>

@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Product Management</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: #f7f9fc;
+      margin: 0;
+      padding: 20px;
+      color: #333;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    /* Search bar */
+    .search-container {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .search-container input {
+      width: 50%;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+
+    /* Add Product Button */
+    .add-btn {
+      display: block;
+      margin: 0 auto 20px auto;
+      background: #4CAF50;
+      color: white;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .add-btn:hover {
+      background: #45a049;
+    }
+
+    /* Table */
+    table {
+      width: 90%;
+      margin: auto;
+      border-collapse: collapse;
+      background: white;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    th, td {
+      padding: 12px 15px;
+      text-align: left;
+    }
+    th {
+      background: #4CAF50;
+      color: white;
+    }
+    tr:nth-child(even) {
+      background: #f2f2f2;
+    }
+    tr:hover {
+      background: #e9f7ef;
+    }
+    .action-btn {
+      padding: 6px 12px;
+      margin: 0 3px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .edit-btn {
+      background: #2196F3;
+      color: white;
+    }
+    .delete-btn {
+      background: #f44336;
+      color: white;
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    .modal-content {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      width: 600px;
+      max-height: 85vh;
+      overflow-y: auto;
+      animation: slideDown 0.3s ease;
+    }
+    @keyframes slideDown {
+      from { transform: translateY(-50px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 8px;
+      margin-bottom: 15px;
+    }
+    .close-btn {
+      font-size: 22px;
+      cursor: pointer;
+      color: #666;
+    }
+
+    /* Form Layout */
+    form {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px 20px;
+    }
+    form label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    form input {
+      width: 100%;
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    form button {
+      grid-column: span 2;
+      margin-top: 10px;
+      padding: 12px;
+      background: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    form button:hover {
+      background: #45a049;
+    }
+
+    #result {
+      text-align: center;
+      margin: 15px 0;
+      font-weight: bold;
+    }
+</style>
+</head>
+<body>
+
+<h1>Product Management</h1>
+
+<div class="search-container">
+  <input type="text" id="searchBar" placeholder="Search products...">
+</div>
+
+<button class="add-btn" id="openModalBtn">+ Add Product</button>
+
+<div id="result"></div>
+
+<table id="productTable">
+  <thead>
+    <tr>
+      <th>Name</th><th>Code</th><th>MRP</th><th>Cost Price</th>
+      <th>Quantity</th><th>CGST</th><th>SGST</th><th>Discount</th>
+      <th>Supplier</th><th>Actions</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<!-- Modal -->
+<div id="productModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 id="modalTitle">Add Product</h2>
+      <span class="close-btn" id="closeModal">&times;</span>
+    </div>
+    <form id="productForm">
+      <input type="hidden" id="productId">
+
+      <div>
+        <label>Name:</label>
+        <input type="text" id="name" required>
+      </div>
+      <div>
+        <label>Code:</label>
+        <input type="text" id="code" required>
+      </div>
+    <div>
+  <label>MRP (incl. GST):</label>
+  <input type="number" id="price" required>
+</div>
+
+      <div>
+        <label>Cost Price:</label>
+        <input type="number" id="costPrice" required>
+      </div>
+      <div>
+        <label>Quantity:</label>
+        <input type="number" id="quantity" required>
+      </div>
+      <div>
+        <label>Supplier:</label>
+        <input type="text" id="supplier">
+      </div>
+      <div>
+        <label>CGST (%):</label>
+        <input type="number" id="cgst" value="0">
+      </div>
+      <div>
+        <label>SGST (%):</label>
+        <input type="number" id="sgst" value="0">
+      </div>
+      <div>
+        <label>Discount (%):</label>
+        <input type="number" id="discount" value="0">
+      </div>
+
+      <button type="submit">Save Product</button>
+    </form>
+  </div>
+</div>
+
+
+<script>
+(function () {
+  const BACKEND = 'http://localhost:3000';
+  const userEmail = localStorage.getItem('userEmail') || 'webnetic78@example.com';
+
+  const form = document.getElementById('productForm');
+  const tableBody = document.querySelector('#productTable tbody');
+  const result = document.getElementById('result');
+  const modal = document.getElementById('productModal');
+  const openModalBtn = document.getElementById('openModalBtn');
+  const closeModal = document.getElementById('closeModal');
+  const modalTitle = document.getElementById('modalTitle');
+  const searchBar = document.getElementById('searchBar');
+
+  openModalBtn.onclick = () => {
+    form.reset();
+    document.getElementById('productId').value = '';
+    modalTitle.textContent = "Add Product";
+    modal.style.display = "flex";
+  };
+  closeModal.onclick = () => modal.style.display = "none";
+  window.onclick = (e) => { if (e.target == modal) modal.style.display = "none"; };
+
+  form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const id = document.getElementById('productId').value;
+
+  const product = {
+    email: userEmail,
+    name: form.name.value.trim(),
+    code: form.code.value.trim(),
+    price: parseFloat(form.price.value),
+    costPrice: parseFloat(form.costPrice.value),
+    quantity: parseInt(form.quantity.value, 10),
+    supplier: form.supplier.value.trim(),
+    cgst: parseFloat(form.cgst.value) || 0,
+    sgst: parseFloat(form.sgst.value) || 0,
+    discount: parseFloat(form.discount.value) || 0
+  };
+
+  try {
+    let res;
+    if (id) {
+      res = await fetch(`${BACKEND}/api/products/${id}?email=${encodeURIComponent(userEmail)}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(product)
+      });
+    } else {
+      res = await fetch(`${BACKEND}/api/products`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(product)
+      });
+    }
+
+    if (!res.ok) throw new Error('Failed to save product');
+    result.innerText = id ? '✅ Product updated!' : '✅ Product added!';
+
+    // Clear the form BEFORE reloading the table
+    form.reset();
+    document.getElementById('productId').value = '';
+    modalTitle.textContent = "Add Product";
+
+    // Reload the table
+    await loadProducts();
+
+  } catch (err) {
+    console.error(err);
+    result.innerText = '❌ ' + err.message;
+  }
+});
+
+
+  function addProductToTable(product) {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${escapeHtml(product.name)}</td>
+      <td>${escapeHtml(product.code)}</td>
+      <td>${product.price}</td>
+      <td>${product.costPrice || 0}</td>
+      <td>${product.quantity}</td>
+      <td>${product.cgst || 0}</td>
+      <td>${product.sgst || 0}</td>
+      <td>${product.discount || 0}</td>
+      <td>${escapeHtml(product.supplier || '')}</td>
+      <td>
+        <button class="action-btn edit-btn">Edit</button>
+        <button class="action-btn delete-btn">Delete</button>
+      </td>
+    `;
+    tableBody.appendChild(row);
+
+    row.querySelector('.edit-btn').addEventListener('click', () => {
+      document.getElementById('productId').value = product._id;
+      form.name.value = product.name;
+      form.code.value = product.code;
+      form.price.value = product.price;
+      form.costPrice.value = product.costPrice || '';
+      form.quantity.value = product.quantity;
+      form.supplier.value = product.supplier || '';
+      form.cgst.value = product.cgst || 0;
+      form.sgst.value = product.sgst || 0;
+      form.discount.value = product.discount || 0;
+      modalTitle.textContent = "Edit Product";
+      modal.style.display = "flex";
+    });
+
+    row.querySelector('.delete-btn').addEventListener('click', async () => {
+      if (!confirm('Are you sure you want to delete this product?')) return;
+      try {
+        const res = await fetch(`${BACKEND}/api/products/${product._id}?email=${encodeURIComponent(userEmail)}`, { method: 'DELETE' });
+        if (!res.ok) throw new Error('Failed to delete product');
+        result.innerText = '✅ Product deleted.';
+        loadProducts();
+      } catch (err) {
+        console.error(err);
+        result.innerText = '❌ Failed to delete product.';
+      }
+    });
+  }
+
+  async function loadProducts() {
+    tableBody.innerHTML = '';
+    try {
+      const res = await fetch(`${BACKEND}/api/products?email=${encodeURIComponent(userEmail)}`);
+      if (!res.ok) throw new Error('Failed to load products');
+      const products = await res.json();
+      window.allProducts = products;
+      products.forEach(addProductToTable);
+    } catch (err) {
+      console.error(err);
+      result.innerText = '❌ Error loading products';
+    }
+  }
+
+  searchBar.addEventListener('input', () => {
+    const q = searchBar.value.toLowerCase();
+    tableBody.innerHTML = '';
+    window.allProducts
+      .filter(p => p.name.toLowerCase().includes(q) || p.code.toLowerCase().includes(q) || (p.supplier || '').toLowerCase().includes(q))
+      .forEach(addProductToTable);
+  });
+
+  function escapeHtml(str) {
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+                      .replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+  }
+
+  loadProducts();
+})();
+</script>
+</body>
+</html>
