@@ -105,22 +105,19 @@ document.addEventListener("DOMContentLoaded", () => {
   const companyPhoneEl = qs('#companyPhone');
 
   /* API endpoints (explicit origin to avoid dev server confusion) */
- const API_BASE = window.location.hostname.includes('localhost')
+  const API_BASE = window.location.hostname.includes('localhost')
   ? 'http://localhost:3000'
   : window.location.hostname.includes('my-software-707y.onrender.com')
     ? 'https://my-software-707y.onrender.com'
     : 'https://my-software.onrender.com';
 
-
-
-const API = {
-  newNumber: `${API_BASE}/api/invoices/new-number?email=${encodeURIComponent(userEmail)}`,
-  searchProducts: q => `${API_BASE}/api/products/search/${encodeURIComponent(q)}?email=${encodeURIComponent(userEmail)}`,
-  productByCode: code => `${API_BASE}/api/products/code/${encodeURIComponent(code)}?email=${encodeURIComponent(userEmail)}`,
-  profile: `${API_BASE}/api/profile?email=${encodeURIComponent(userEmail)}`,
-  saveInvoice: `${API_BASE}/api/invoices?email=${encodeURIComponent(userEmail)}`
-};
-
+  const API = {
+    newNumber: `${API_BASE}/api/invoices/new-number?email=${encodeURIComponent(userEmail)}`,
+    searchProducts: q => `${API_BASE}/api/products/search/${encodeURIComponent(q)}?email=${encodeURIComponent(userEmail)}`,
+    productByCode: code => `${API_BASE}/api/products/code/${encodeURIComponent(code)}?email=${encodeURIComponent(userEmail)}`,
+    profile: `${API_BASE}/api/profile?email=${encodeURIComponent(userEmail)}`,
+    saveInvoice: `${API_BASE}/api/invoices?email=${encodeURIComponent(userEmail)}`
+  };
 
   if (!itemsTbody) {
     console.error('invoice.js: missing tbody with id "invoice-items". Please add <tbody id="invoice-items"></tbody> to your table.');
@@ -404,7 +401,7 @@ document.addEventListener("keydown", async (e) => {
     if (codeInput) codeInput.value = scannedCode;
 
     try {
-      const res = await fetch(`/api/products/code/${encodeURIComponent(scannedCode)}`);
+const res = await fetch(`${API_BASE}/api/products/code/${encodeURIComponent(scannedCode)}`);
       if (!res.ok) throw new Error("Invalid product code");
       const prod = await res.json();
 
@@ -442,7 +439,7 @@ document.addEventListener("keydown", async (e) => {
     if (!userEmail) throw new Error("No user email found in localStorage");
 
     // Correct fetch URL with only one query param
-    const res = await fetch(`/api/invoices/new-number?userEmail=${encodeURIComponent(userEmail)}`);
+const res = await fetch(`${API_BASE}/api/invoices/new-number?userEmail=${encodeURIComponent(userEmail)}`);
     const data = await res.json();
 
     if (res.ok && data && data.invoiceNumber) {
@@ -497,7 +494,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const userEmail = localStorage.getItem("userEmail");
     if (!userEmail) return;
 
-    const res = await fetch(`/api/profile?userEmail=${encodeURIComponent(userEmail)}`);
+const res = await fetch(`${API_BASE}/api/profile?userEmail=${encodeURIComponent(userEmail)}`);
     if (!res.ok) throw new Error("Failed to load profile");
 
     const profile = await res.json();
@@ -558,11 +555,12 @@ document.addEventListener("DOMContentLoaded", loadProfile);
 
     const payload = { userEmail, companyName, companyAddress, companyPhone, companyLogo };
 
-    const res = await fetch("/api/profile", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
+    const res = await fetch(`${API_BASE}/api/profile`, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify(payload),
+});
+
 
     if (!res.ok) throw new Error("Failed to save profile");
     alert("Profile saved!");
@@ -789,11 +787,12 @@ const companyLogo = companyLogoImg?.src || "";
   companyPhone, 
   companyLogo, items, subtotal, totalDiscount, totalTax, totalAmount: grandTotal };
 
-    const res = await fetch("http://localhost:3000/api/invoices", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "x-user-email": String(userEmail) },
-      body: JSON.stringify(payload),
-    });
+    const res = await fetch(API.saveInvoice, {
+  method: "POST",
+  headers: { "Content-Type": "application/json", "x-user-email": String(userEmail) },
+  body: JSON.stringify(payload),
+});
+
 
     const data = await res.json().catch(() => ({}));
 
@@ -837,7 +836,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const userEmail = localStorage.getItem("userEmail");
   if (userEmail) {
     try {
-      const res = await fetch(`http://localhost:3000/api/invoices/new-number?userEmail=${encodeURIComponent(userEmail)}`);
+const res = await fetch(API.newNumber);
       const data = await res.json();
 
       const invoiceNumberDisplay = document.querySelector("#invoiceNumberDisplay");
