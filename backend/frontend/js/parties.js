@@ -7,25 +7,26 @@ const API_BASE = window.location.hostname.includes('localhost')
 
 const userEmail = localStorage.getItem("userEmail"); // MUST be set by login
 
-// DOM
+// DOM elements
 const partyForm = document.getElementById("partyForm");
 const partiesList = document.getElementById("partiesList");
 const searchInput = document.getElementById("search");
 
-// small helper
+// helpers
 const fmtDateVal = (d) => d ? new Date(d).toISOString().slice(0,10) : "";
 const fmtDatePretty = (d) => d ? new Date(d).toLocaleDateString() : "-";
 
 if (!userEmail) {
-  // quick friendly message in UI
-  partiesList.innerHTML = `<div class="card small">No userEmail found in localStorage. Run <code>localStorage.setItem("userEmail","you@example.com")</code> in console and reload.</div>`;
+  partiesList.innerHTML = `<div class="card small">
+    No userEmail found in localStorage. Run <code>localStorage.setItem("userEmail","you@example.com")</code> in console and reload.
+  </div>`;
 }
 
 // Load parties
 async function loadParties() {
   if (!userEmail) return;
   try {
-    const res = await fetch(`${API_BASE}/parties?userEmail=${encodeURIComponent(userEmail)}`);
+    const res = await fetch(`${API_BASE}/api/parties?userEmail=${encodeURIComponent(userEmail)}`);
     const parties = await res.json();
     renderParties(parties || []);
   } catch (err) {
@@ -33,9 +34,11 @@ async function loadParties() {
   }
 }
 
+// Render parties
 function renderParties(parties) {
   const term = (searchInput?.value || "").toLowerCase();
   partiesList.innerHTML = "";
+
   parties
     .filter(p => [p.partyName, p.partyNumber, p.partyGST].join(" ").toLowerCase().includes(term))
     .forEach(p => {
@@ -65,7 +68,7 @@ function renderParties(parties) {
       const billsBox = document.createElement("div");
       billsBox.className = "bills";
 
-      // inline add/edit form (hidden by default)
+      // inline add/edit form
       const inlineForm = document.createElement("div");
       inlineForm.className = "inline-form";
       inlineForm.style.display = "none";
@@ -77,9 +80,8 @@ function renderParties(parties) {
         <button class="btn primary bf-save">Save</button>
       `;
 
-      // render bills list
-      function renderBillsList(party) {
-        // clear old bill rows
+      // Render bills list
+      async function renderBillsList(party) {
         billsBox.innerHTML = "";
         if (!party.bills || party.bills.length === 0) {
           const e = document.createElement("div");
@@ -87,7 +89,6 @@ function renderParties(parties) {
           e.textContent = "No bills yet.";
           billsBox.appendChild(e);
         } else {
-          // each bill row
           party.bills.slice().reverse().forEach(b => {
             const row = document.createElement("div");
             row.className = "bill-row";
@@ -121,7 +122,7 @@ function renderParties(parties) {
             row.querySelector(".del-bill").onclick = async (ev) => {
               ev.stopPropagation();
               if (!confirm("Delete this bill?")) return;
-              await fetch(`${API_BASE}/parties/${p._id}/bills/${b._id}`, {
+              await fetch(`${API_BASE}/api/parties/${p._id}/bills/${b._id}`, {
                 method: "DELETE",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ userEmail })
@@ -133,7 +134,7 @@ function renderParties(parties) {
             row.querySelector(".toggle-status").onclick = async (ev) => {
               ev.stopPropagation();
               const newStatus = b.status === "paid" ? "unpaid" : "paid";
-              await fetch(`${API_BASE}/parties/${p._id}/bills/${b._id}`, {
+              await fetch(`${API_BASE}/api/parties/${p._id}/bills/${b._id}`, {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ userEmail, status: newStatus })
@@ -145,14 +146,15 @@ function renderParties(parties) {
             billsBox.appendChild(row);
           });
         }
-        // append hr and inlineForm
+
+        // append inline form
         const hr = document.createElement("div");
         hr.className = "hr";
         billsBox.appendChild(document.createElement("div")); // spacer
         billsBox.appendChild(inlineForm);
       }
 
-      // add bill button shows inline form and sets editing empty
+      // Add bill
       head.querySelector(".add-bill").onclick = (ev) => {
         ev.stopPropagation();
         wrapper.classList.add("open");
@@ -166,16 +168,16 @@ function renderParties(parties) {
         inlineForm.querySelector(".bf-inv").focus();
       };
 
-      // delete party
+      // Delete party
       head.querySelector(".del-party").onclick = async (ev) => {
         ev.stopPropagation();
         if (!confirm("Delete this party and all its bills?")) return;
-        await fetch(`${API_BASE}/parties/${p._1? p._1: p._id}?userEmail=${encodeURIComponent(userEmail)}`, { method: "DELETE" })
+        await fetch(`${API_BASE}/api/parties/${p._id}?userEmail=${encodeURIComponent(userEmail)}`, { method: "DELETE" })
           .catch(err => console.error(err));
         await loadParties();
       };
 
-      // inline save (create or edit)
+      // Inline save for bill
       inlineForm.querySelector(".bf-save").onclick = async (ev) => {
         ev.preventDefault();
         ev.stopPropagation();
@@ -192,15 +194,13 @@ function renderParties(parties) {
         }
 
         if (editingId) {
-          // update
-          await fetch(`${API_BASE}/parties/${p._id}/bills/${editingId}`, {
+          await fetch(`${API_BASE}/api/parties/${p._id}/bills/${editingId}`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ userEmail, invoiceNumber, amount, billDate, dueDate })
           });
         } else {
-          // create
-          await fetch(`${API_BASE}/parties/${p._id}/bills`, {
+          await fetch(`${API_BASE}/api/parties/${p._id}/bills`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ userEmail, invoiceNumber, amount, billDate, dueDate })
@@ -213,17 +213,12 @@ function renderParties(parties) {
         renderBillsList(latest);
       };
 
-      // toggle expand on header click
+      // toggle expand
       head.onclick = (ev) => {
-        // don't toggle when clicking buttons inside header
         if (ev.target.closest(".actions")) return;
         const open = wrapper.classList.toggle("open");
-        if (open) {
-          renderBillsList(p);
-        } else {
-          // hide
-          inlineForm.style.display = "none";
-        }
+        if (open) renderBillsList(p);
+        else inlineForm.style.display = "none";
       };
 
       body.appendChild(billsBox);
@@ -233,14 +228,14 @@ function renderParties(parties) {
     });
 }
 
-// refetch single party
+// Refetch single party
 async function refetchParty(id) {
-  const res = await fetch(`${API_BASE}/parties?userEmail=${encodeURIComponent(userEmail)}`);
+  const res = await fetch(`${API_BASE}/api/parties?userEmail=${encodeURIComponent(userEmail)}`);
   const arr = await res.json();
   return arr.find(x => x._id === id);
 }
 
-// add party form submit
+// Add party form submit
 partyForm.addEventListener("submit", async (ev) => {
   ev.preventDefault();
   if (!userEmail) return alert("userEmail missing in localStorage");
@@ -252,7 +247,7 @@ partyForm.addEventListener("submit", async (ev) => {
   if (!partyName) return alert("Party Name is required");
 
   try {
-    await fetch(`${API_BASE}/parties`, {
+    await fetch(`${API_BASE}/api/parties`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ userEmail, partyName, partyNumber, partyGST })
@@ -265,14 +260,14 @@ partyForm.addEventListener("submit", async (ev) => {
   }
 });
 
-// search
+// Search
 if (searchInput) searchInput.addEventListener("input", loadParties);
 
-// escape helper to avoid injection into DOM
+// Escape HTML
 function escapeHtml(s) {
   if (!s) return "";
   return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
 }
 
-// init
+// Initialize
 loadParties();
