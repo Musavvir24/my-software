@@ -1,4 +1,6 @@
-const API_BASE = 'http://localhost:3000';
+const API_BASE = window.location.hostname.includes('localhost')
+  ? 'http://localhost:3000'
+  : 'https://my-software.onrender.com';
 const userEmail = localStorage.getItem('userEmail') || 'webnetic78@example.com';
 
 // Safe DOM text setter

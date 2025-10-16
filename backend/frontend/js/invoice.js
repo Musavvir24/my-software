@@ -105,14 +105,19 @@ document.addEventListener("DOMContentLoaded", () => {
   const companyPhoneEl = qs('#companyPhone');
 
   /* API endpoints (explicit origin to avoid dev server confusion) */
-  const API_BASE = 'http://localhost:3000'; // change if backend runs on different port
-  const API = {
-    newNumber: `${API_BASE}/api/invoices/new-number?email=${encodeURIComponent(userEmail)}`,
-    searchProducts: q => `${API_BASE}/api/products/search/${encodeURIComponent(q)}?email=${encodeURIComponent(userEmail)}`,
-    productByCode: code => `${API_BASE}/api/products/code/${encodeURIComponent(code)}?email=${encodeURIComponent(userEmail)}`,
-    profile: `${API_BASE}/api/profile?email=${encodeURIComponent(userEmail)}`,
-    saveInvoice: `${API_BASE}/api/invoices?email=${encodeURIComponent(userEmail)}`
-  };
+ const API_BASE = window.location.hostname.includes('localhost')
+  ? 'http://localhost:3000'
+  : 'https://my-software.onrender.com';
+
+
+const API = {
+  newNumber: `${API_BASE}/api/invoices/new-number?email=${encodeURIComponent(userEmail)}`,
+  searchProducts: q => `${API_BASE}/api/products/search/${encodeURIComponent(q)}?email=${encodeURIComponent(userEmail)}`,
+  productByCode: code => `${API_BASE}/api/products/code/${encodeURIComponent(code)}?email=${encodeURIComponent(userEmail)}`,
+  profile: `${API_BASE}/api/profile?email=${encodeURIComponent(userEmail)}`,
+  saveInvoice: `${API_BASE}/api/invoices?email=${encodeURIComponent(userEmail)}`
+};
+
 
   if (!itemsTbody) {
     console.error('invoice.js: missing tbody with id "invoice-items". Please add <tbody id="invoice-items"></tbody> to your table.');

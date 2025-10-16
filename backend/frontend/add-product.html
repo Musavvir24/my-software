@@ -244,8 +244,12 @@
 
 <script>
 (function () {
-  const BACKEND = 'http://localhost:3000';
-  const userEmail = localStorage.getItem('userEmail') || 'webnetic78@example.com';
+  const BACKEND = window.location.hostname.includes('localhost')
+  ? 'http://localhost:3000'
+  : 'https://my-software.onrender.com';
+
+const userEmail = localStorage.getItem('userEmail') || 'webnetic78@example.com';
+
 
   const form = document.getElementById('productForm');
   const tableBody = document.querySelector('#productTable tbody');

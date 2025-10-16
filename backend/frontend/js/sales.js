@@ -1,3 +1,8 @@
+const API_BASE = window.location.hostname.includes('localhost')
+  ? 'http://localhost:3000'
+  : 'https://my-software.onrender.com';
+const userEmail = localStorage.getItem("userEmail");
+
 document.addEventListener("DOMContentLoaded", () => {
   loadSalesDailyTotals();
 });

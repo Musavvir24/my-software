@@ -1,6 +1,8 @@
 // public/js/parties.js
-const API_BASE = "/api";
-const userEmail = localStorage.getItem("userEmail"); // MUST be set by you (login) before using
+const API_BASE = window.location.hostname.includes('localhost')
+  ? 'http://localhost:3000'
+  : 'https://my-software.onrender.com';
+const userEmail = localStorage.getItem("userEmail"); // MUST be set by login
 
 // DOM
 const partyForm = document.getElementById("partyForm");
