@@ -444,7 +444,6 @@ const res = await fetch(API.productByCode(scannedCode, userEmail));
      ------------------------ */
  async function loadInvoiceNumberAndDate() {
   try {
-    const userEmail = localStorage.getItem("userEmail");
     if (!userEmail) throw new Error("No user email found in localStorage");
 
     // Correct fetch URL with only one query param
@@ -500,7 +499,6 @@ document.addEventListener("DOMContentLoaded", async () => {
      ------------------------ */
   async function loadProfile() {
   try {
-    const userEmail = localStorage.getItem("userEmail");
     if (!userEmail) return;
 
 const res = await fetch(API.profile(userEmail));
@@ -549,7 +547,6 @@ document.addEventListener("DOMContentLoaded", loadProfile);
 
  async function saveProfile() {
   try {
-    const userEmail = localStorage.getItem("userEmail");
     if (!userEmail) {
       alert("No user email found!");
       return;
@@ -770,7 +767,6 @@ async function saveInvoice() {
   try {
     saveInvoiceBtn.disabled = true;
 
-    const userEmail = localStorage.getItem("userEmail");
     if (!userEmail) { alert("No user email found!"); return; }
 const invoiceNumber = document.querySelector("#invoiceNumberDisplay")?.textContent?.trim();
 const invoiceDate = document.querySelector("#invoiceDateDisplay")?.textContent?.trim() || new Date().toISOString().split("T")[0];
@@ -845,7 +841,6 @@ const companyLogo = companyLogoImg?.src || "";
 document.addEventListener("DOMContentLoaded", async () => {
   await loadProfile();
 
-  const userEmail = localStorage.getItem("userEmail");
   if (userEmail) {
     try {
 const res = await fetch(API.newNumber(userEmail));
