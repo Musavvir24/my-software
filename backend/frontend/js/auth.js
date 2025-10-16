@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const switchToSignup = document.getElementById("switchToSignup");
   const switchToLogin = document.getElementById("switchToLogin");
 
-  const BACKEND_URL = "https://my-software.onrender.com"; // <-- hosted backend URL
+const BACKEND_URL = window.location.origin;
 
   // ===== Switcher =====
   if (switchToSignup) {
