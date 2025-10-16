@@ -61,7 +61,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Get user email from localStorage (adjust if you use a different method)
-  const userEmail = localStorage.getItem('userEmail') || '';
+
 
   /* ------------------------
      DOM refs (match your HTML)
@@ -105,19 +105,26 @@ document.addEventListener("DOMContentLoaded", () => {
   const companyPhoneEl = qs('#companyPhone');
 
   /* API endpoints (explicit origin to avoid dev server confusion) */
-  const API_BASE = window.location.hostname.includes('localhost')
+ // ------------------------
+// API endpoints (explicit origin)
+// ------------------------
+const userEmail = localStorage.getItem("userEmail") || "";
+
+const API_BASE = window.location.hostname.includes('localhost')
   ? 'http://localhost:3000'
   : window.location.hostname.includes('my-software-707y.onrender.com')
     ? 'https://my-software-707y.onrender.com'
     : 'https://my-software.onrender.com';
 
-  const API = {
-    newNumber: `${API_BASE}/api/invoices/new-number?email=${encodeURIComponent(userEmail)}`,
-    searchProducts: q => `${API_BASE}/api/products/search/${encodeURIComponent(q)}?email=${encodeURIComponent(userEmail)}`,
-    productByCode: code => `${API_BASE}/api/products/code/${encodeURIComponent(code)}?email=${encodeURIComponent(userEmail)}`,
-    profile: `${API_BASE}/api/profile?email=${encodeURIComponent(userEmail)}`,
-    saveInvoice: `${API_BASE}/api/invoices?email=${encodeURIComponent(userEmail)}`
-  };
+const API = {
+  newNumber: (email) => `${API_BASE}/api/invoices/new-number?email=${encodeURIComponent(email)}`,
+  searchProducts: q => `${API_BASE}/api/products/search/${encodeURIComponent(q)}?email=${encodeURIComponent(userEmail)}`,
+  productByCode: code => `${API_BASE}/api/products/code/${encodeURIComponent(code)}?email=${encodeURIComponent(userEmail)}`,
+  profile: `${API_BASE}/api/profile?email=${encodeURIComponent(userEmail)}`,
+  saveInvoice: `${API_BASE}/api/invoices?email=${encodeURIComponent(userEmail)}`
+};
+
+
 
   if (!itemsTbody) {
     console.error('invoice.js: missing tbody with id "invoice-items". Please add <tbody id="invoice-items"></tbody> to your table.');
@@ -185,7 +192,8 @@ function bindRowEvents(row) {
     if (!q) return;
 
     try {
-      const res = await fetch(API.searchProducts(q));
+// Define API function
+const res = await fetch(API.searchProducts(q));
       if (!res.ok) return;
       const list = await res.json();
       if (!list || !list.length) return;
@@ -401,7 +409,7 @@ document.addEventListener("keydown", async (e) => {
     if (codeInput) codeInput.value = scannedCode;
 
     try {
-const res = await fetch(`${API_BASE}/api/products/code/${encodeURIComponent(scannedCode)}`);
+const res = await fetch(API.productByCode(scannedCode));
       if (!res.ok) throw new Error("Invalid product code");
       const prod = await res.json();
 
@@ -439,7 +447,7 @@ const res = await fetch(`${API_BASE}/api/products/code/${encodeURIComponent(scan
     if (!userEmail) throw new Error("No user email found in localStorage");
 
     // Correct fetch URL with only one query param
-const res = await fetch(`${API_BASE}/api/invoices/new-number?email=${encodeURIComponent(userEmail)}`);
+const res = await fetch(API.newNumber(userEmail));
     const data = await res.json();
 
     if (res.ok && data && data.invoiceNumber) {
@@ -494,7 +502,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const userEmail = localStorage.getItem("userEmail");
     if (!userEmail) return;
 
-const res = await fetch(`${API_BASE}/api/profile?userEmail=${encodeURIComponent(userEmail)}`);
+const res = await fetch(API.profile);
     if (!res.ok) throw new Error("Failed to load profile");
 
     const profile = await res.json();
@@ -555,11 +563,12 @@ document.addEventListener("DOMContentLoaded", loadProfile);
 
     const payload = { userEmail, companyName, companyAddress, companyPhone, companyLogo };
 
-    const res = await fetch(`${API_BASE}/api/profile`, {
+const res = await fetch(API.profile, {
   method: "POST",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify(payload),
 });
+
 
 
     if (!res.ok) throw new Error("Failed to save profile");
