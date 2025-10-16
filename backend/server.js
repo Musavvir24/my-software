@@ -4,20 +4,30 @@ const path = require('path');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const fs = require("fs");
-const fsp = require("fs").promises; // for reading template
+const fsp = require("fs").promises;
 const puppeteer = require('puppeteer');
 const bcrypt = require('bcrypt');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware
-// Middleware
-app.use(cors());
+// ✅ CORS FIX
+app.use(cors({
+  origin: [
+    'https://my-software-707y.onrender.com',
+    'http://localhost:3000',
+    'http://localhost:5173'
+  ],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  credentials: true
+}));
 
-// allow larger JSON + form-data payloads (for base64 logos, etc.)
+app.options('*', cors());
+
+// Allow larger JSON + form-data payloads
 app.use(bodyParser.json({ limit: '5mb' }));
 app.use(bodyParser.urlencoded({ limit: '5mb', extended: true }));
 
+// Static files
 app.use(express.static(path.join(__dirname, 'frontend')));
 app.use('/invoices', express.static(path.join(__dirname, 'invoices')));
 
