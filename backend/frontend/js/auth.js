@@ -6,6 +6,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const switchToSignup = document.getElementById("switchToSignup");
   const switchToLogin = document.getElementById("switchToLogin");
 
+  const BACKEND_URL = "https://my-software.onrender.com"; // <-- hosted backend URL
+
   // ===== Switcher =====
   if (switchToSignup) {
     switchToSignup.addEventListener("click", e => {
@@ -31,7 +33,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!email || !password) return alert("Please enter email and password");
 
       try {
-        const res = await fetch("http://localhost:3000/api/login", {
+        const res = await fetch(`${BACKEND_URL}/api/login`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email, password })
@@ -63,7 +65,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!name || !email || !password) return alert("Please fill in all fields");
 
       try {
-        const res = await fetch("http://localhost:3000/api/signup", {
+        const res = await fetch(`${BACKEND_URL}/api/signup`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ name, email, password })
