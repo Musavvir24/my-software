@@ -439,7 +439,7 @@ const res = await fetch(`${API_BASE}/api/products/code/${encodeURIComponent(scan
     if (!userEmail) throw new Error("No user email found in localStorage");
 
     // Correct fetch URL with only one query param
-const res = await fetch(`${API_BASE}/api/invoices/new-number?userEmail=${encodeURIComponent(userEmail)}`);
+const res = await fetch(`${API_BASE}/api/invoices/new-number?email=${encodeURIComponent(userEmail)}`);
     const data = await res.json();
 
     if (res.ok && data && data.invoiceNumber) {
