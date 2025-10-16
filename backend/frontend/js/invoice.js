@@ -108,7 +108,7 @@ document.addEventListener("DOMContentLoaded", () => {
  // ------------------------
 // API endpoints (explicit origin)
 // ------------------------
-const userEmail = localStorage.getItem("userEmail") || "";
+const userEmail = localStorage.getItem("userEmail") || "webnetic78@example.com";
 
 const API_BASE = window.location.hostname.includes('localhost')
   ? 'http://localhost:3000'
@@ -118,11 +118,12 @@ const API_BASE = window.location.hostname.includes('localhost')
 
 const API = {
   newNumber: (email) => `${API_BASE}/api/invoices/new-number?email=${encodeURIComponent(email)}`,
-  searchProducts: q => `${API_BASE}/api/products/search/${encodeURIComponent(q)}?email=${encodeURIComponent(userEmail)}`,
-  productByCode: code => `${API_BASE}/api/products/code/${encodeURIComponent(code)}?email=${encodeURIComponent(userEmail)}`,
-  profile: `${API_BASE}/api/profile?email=${encodeURIComponent(userEmail)}`,
-  saveInvoice: `${API_BASE}/api/invoices?email=${encodeURIComponent(userEmail)}`
+  searchProducts: (q, email) => `${API_BASE}/api/products/search/${encodeURIComponent(q)}?email=${encodeURIComponent(email)}`,
+  productByCode: (code, email) => `${API_BASE}/api/products/code/${encodeURIComponent(code)}?email=${encodeURIComponent(email)}`,
+  profile: (email) => `${API_BASE}/api/profile?email=${encodeURIComponent(email)}`,
+  saveInvoice: (email) => `${API_BASE}/api/invoices?email=${encodeURIComponent(email)}`
 };
+
 
 
 
@@ -193,7 +194,7 @@ function bindRowEvents(row) {
 
     try {
 // Define API function
-const res = await fetch(API.searchProducts(q));
+const res = await fetch(API.searchProducts(q, userEmail));
       if (!res.ok) return;
       const list = await res.json();
       if (!list || !list.length) return;
@@ -409,7 +410,7 @@ document.addEventListener("keydown", async (e) => {
     if (codeInput) codeInput.value = scannedCode;
 
     try {
-const res = await fetch(API.productByCode(scannedCode));
+const res = await fetch(API.productByCode(scannedCode, userEmail));
       if (!res.ok) throw new Error("Invalid product code");
       const prod = await res.json();
 
@@ -502,7 +503,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const userEmail = localStorage.getItem("userEmail");
     if (!userEmail) return;
 
-const res = await fetch(API.profile);
+const res = await fetch(API.profile(userEmail));
     if (!res.ok) throw new Error("Failed to load profile");
 
     const profile = await res.json();
@@ -563,11 +564,12 @@ document.addEventListener("DOMContentLoaded", loadProfile);
 
     const payload = { userEmail, companyName, companyAddress, companyPhone, companyLogo };
 
-const res = await fetch(API.profile, {
+const res = await fetch(API.profile(userEmail), {
   method: "POST",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify(payload),
 });
+
 
 
 
@@ -625,7 +627,7 @@ const res = await fetch(API.profile, {
       let purchasePrice = 0;
       try {
         if (item.code) {
-          const res = await fetch(API.productByCode(item.code));
+const res = await fetch(API.productByCode(item.code, userEmail));
           if (res.ok) {
             const prod = await res.json();
             if (prod) {
@@ -796,11 +798,12 @@ const companyLogo = companyLogoImg?.src || "";
   companyPhone, 
   companyLogo, items, subtotal, totalDiscount, totalTax, totalAmount: grandTotal };
 
-    const res = await fetch(API.saveInvoice, {
+    const res = await fetch(API.saveInvoice(userEmail), {
   method: "POST",
-  headers: { "Content-Type": "application/json", "x-user-email": String(userEmail) },
+  headers: { "Content-Type": "application/json" },
   body: JSON.stringify(payload),
 });
+
 
 
     const data = await res.json().catch(() => ({}));
@@ -845,7 +848,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const userEmail = localStorage.getItem("userEmail");
   if (userEmail) {
     try {
-const res = await fetch(API.newNumber);
+const res = await fetch(API.newNumber(userEmail));
       const data = await res.json();
 
       const invoiceNumberDisplay = document.querySelector("#invoiceNumberDisplay");
