@@ -107,7 +107,10 @@ document.addEventListener("DOMContentLoaded", () => {
   /* API endpoints (explicit origin to avoid dev server confusion) */
  const API_BASE = window.location.hostname.includes('localhost')
   ? 'http://localhost:3000'
-  : 'https://my-software.onrender.com';
+  : window.location.hostname.includes('my-software-707y.onrender.com')
+    ? 'https://my-software-707y.onrender.com'
+    : 'https://my-software.onrender.com';
+
 
 
 const API = {

@@ -10,10 +10,10 @@ const bcrypt = require('bcrypt');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ✅ CORS FIX
 app.use(cors({
   origin: [
     'https://my-software-707y.onrender.com',
+    'https://my-software.onrender.com',  // add this!
     'http://localhost:3000',
     'http://localhost:5173'
   ],
@@ -21,7 +21,6 @@ app.use(cors({
   credentials: true
 }));
 
-app.options('*', cors());
 
 // Allow larger JSON + form-data payloads
 app.use(bodyParser.json({ limit: '5mb' }));
