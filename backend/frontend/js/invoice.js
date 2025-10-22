@@ -117,12 +117,13 @@ const API_BASE = window.location.hostname.includes('localhost')
     : 'https://my-software.onrender.com';
 
 const API = {
-  newNumber: (email) => `${API_BASE}/api/invoices/new-number?email=${encodeURIComponent(email)}`,
-  searchProducts: (q, email) => `${API_BASE}/api/products/search/${encodeURIComponent(q)}?email=${encodeURIComponent(email)}`,
-  productByCode: (code, email) => `${API_BASE}/api/products/code/${encodeURIComponent(code)}?email=${encodeURIComponent(email)}`,
-  profile: (email) => `${API_BASE}/api/profile?email=${encodeURIComponent(email)}`,
-  saveInvoice: (email) => `${API_BASE}/api/invoices?email=${encodeURIComponent(email)}`
+  newNumber: (email) => `${API_BASE}/api/invoices/new-number?userEmail=${encodeURIComponent(email)}`,
+  searchProducts: (q, email) => `${API_BASE}/api/products/search/${encodeURIComponent(q)}?userEmail=${encodeURIComponent(email)}`,
+  productByCode: (code, email) => `${API_BASE}/api/products/code/${encodeURIComponent(code)}?userEmail=${encodeURIComponent(email)}`,
+  profile: (email) => `${API_BASE}/api/profile?userEmail=${encodeURIComponent(email)}`,
+  saveInvoice: (email) => `${API_BASE}/api/invoices?userEmail=${encodeURIComponent(email)}`
 };
+
 
 
 
@@ -487,11 +488,6 @@ function updateDueDate() {
   if (document.querySelector("#due-date")) document.querySelector("#due-date").value = due.toISOString().split("T")[0];
 }
 
-// Call on DOMContentLoaded
-document.addEventListener("DOMContentLoaded", async () => {
-  await loadProfile();
-  await loadInvoiceNumberAndDate();
-});
 
 
   /* ------------------------
@@ -540,9 +536,6 @@ const res = await fetch(API.profile(userEmail));
     console.error("Load profile error:", err);
   }
 }
-
-// Call on page load
-document.addEventListener("DOMContentLoaded", loadProfile);
 
 
  async function saveProfile() {
@@ -837,37 +830,6 @@ const companyLogo = companyLogoImg?.src || "";
 }
 
 
-// Run when invoice page loads
-document.addEventListener("DOMContentLoaded", async () => {
-  await loadProfile();
-
-  if (userEmail) {
-    try {
-const res = await fetch(API.newNumber(userEmail));
-      const data = await res.json();
-
-      const invoiceNumberDisplay = document.querySelector("#invoiceNumberDisplay");
-      const invoiceDateDisplay = document.querySelector("#invoiceDateDisplay");
-
-      if (res.ok && data.invoiceNumber) {
-        if (invoiceNumberDisplay) invoiceNumberDisplay.textContent = data.invoiceNumber;
-        if (invoiceDateDisplay) invoiceDateDisplay.textContent = data.invoiceDate;
-      } else {
-        console.error("Error fetching invoice number:", data);
-      }
-    } catch (err) {
-      console.error("Failed to fetch new invoice number", err);
-    }
-  }
-
-  updateDueDate(); // make sure due date is calculated
-});
-
-
-
-
-
-
   /* ------------------------
      Event bindings
      ------------------------ */
@@ -876,6 +838,12 @@ const res = await fetch(API.newNumber(userEmail));
       addRowAndFocus();
     });
   }
+  // ✅ Final version to keep
+document.addEventListener("DOMContentLoaded", async () => {
+  await loadProfile();
+  await loadInvoiceNumberAndDate();
+  updateDueDate(); // make sure due date shows right away
+});
 
   
 
