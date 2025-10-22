@@ -434,7 +434,7 @@ app.delete('/api/products/:id', async (req, res) => {
 // ✅ Search product (by name/code)
 app.get('/api/products/search/:query', async (req, res) => {
   try {
-    const { email } = req.query;
+const email = req.query.userEmail || req.query.email;
     const { query } = req.params;
     if (!email) return res.status(400).json({ error: 'Email is required' });
     if (!query) return res.status(400).json({ error: 'Search query is required' });
