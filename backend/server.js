@@ -745,27 +745,37 @@ await newInvoice.save();
       .replace(/{{totalGST}}/g, totalGST.toFixed(2))
       .replace(/{{grandTotal}}/g, grandTotal.toFixed(2));
 
-    // ===== Generate PDF =====
-    const pdfDir = path.join(__dirname, "invoices");
-    if (!fs.existsSync(pdfDir)) fs.mkdirSync(pdfDir);
-    const pdfPath = path.join(pdfDir, `invoice-${invoiceNumber}.pdf`);
+   // ===== Generate PDF =====
+const pdfDir = path.join("/tmp", "invoices"); // ✅ Use /tmp (Render's writable dir)
+if (!fs.existsSync(pdfDir)) fs.mkdirSync(pdfDir);
 
-    const browser = await puppeteer.launch({
-      headless: "new",
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
-    });
-    const page = await browser.newPage();
-    await page.setContent(template, { waitUntil: "networkidle0" });
-    await page.pdf({ path: pdfPath, format: "A4", printBackground: true });
-    await browser.close();
+const pdfPath = path.join(pdfDir, `invoice-${invoiceNumber}.pdf`);
 
-    const pdfUrl = `http://localhost:3000/invoices/invoice-${invoiceNumber}.pdf`;
+const browser = await puppeteer.launch({
+  headless: true,
+  args: [
+    "--no-sandbox",
+    "--disable-setuid-sandbox",
+    "--disable-gpu",
+    "--disable-dev-shm-usage",
+    "--single-process",
+  ],
+});
 
-    res.json({
-      message: "Invoice saved and PDF generated successfully!",
-      pdfUrl,
-      invoice: newInvoice,
-    });
+const page = await browser.newPage();
+await page.setContent(template, { waitUntil: "networkidle0" });
+await page.pdf({ path: pdfPath, format: "A4", printBackground: true });
+await browser.close();
+
+// ✅ Use the real Render URL dynamically
+const baseUrl = req.get("origin") || `${req.protocol}://${req.get("host")}`;
+const pdfUrl = `${baseUrl}/invoices/invoice-${invoiceNumber}.pdf`;
+
+res.json({
+  message: "Invoice saved and PDF generated successfully!",
+  pdfUrl,
+  invoice: newInvoice,
+});
   } catch (err) {
     console.error("Error saving invoice:", err);
     res
