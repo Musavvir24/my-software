@@ -514,7 +514,7 @@ function getModel(userEmail, modelName) {
 // 📌 Get all invoices (for Sales page)
 app.get('/api/invoices', async (req, res) => {
   try {
-    const userEmail = getUserEmail(req);
+const userEmail = req.query.userEmail || req.query.email;
 
 
     if (!userEmail) {
@@ -549,7 +549,7 @@ app.get('/api/invoices', async (req, res) => {
 
 app.post("/api/invoices", async (req, res) => {
   try {
-const userEmail = req.query.userEmail || req.query.email || getUserEmail(req);
+const userEmail = req.query.userEmail || req.query.email;
     console.log("📩 Email header value:", userEmail, typeof userEmail);
 
     if (!userEmail || typeof userEmail !== "string") {
@@ -764,7 +764,7 @@ return {
 
 app.get('/api/invoices/new-number', async (req, res) => {
   try {
-    const userEmail = getUserEmail(req);
+const userEmail = req.query.userEmail || req.query.email;
 
     if (!userEmail) return res.status(400).json({ error: 'Email is required' });
 
