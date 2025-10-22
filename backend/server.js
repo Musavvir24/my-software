@@ -549,7 +549,7 @@ app.get('/api/invoices', async (req, res) => {
 
 app.post("/api/invoices", async (req, res) => {
   try {
-    const userEmail = getUserEmail(req);
+const userEmail = req.query.userEmail || req.query.email || getUserEmail(req);
     console.log("📩 Email header value:", userEmail, typeof userEmail);
 
     if (!userEmail || typeof userEmail !== "string") {
