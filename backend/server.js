@@ -670,25 +670,39 @@ return {
       .join("");
 
     // ===== Save invoice in DB =====
-    const newInvoice = new Invoice({
-      invoiceNumber,
-      invoiceDate: invoiceDate ? new Date(invoiceDate) : new Date(),
-      dueDate,
-      paymentTerms,
-      customerName,
-      customerPhone,
-      items: invoiceItems,
-      subtotal: subTotal,
-      totalDiscount,
-      totalTax: totalGST,
-      totalAmount: grandTotal,
-      totalProfit,
-      companyName,
-      companyAddress,
-      companyPhone,
-      companyLogo,
-    });
-    await newInvoice.save();
+
+// 🩵 Safely parse DD/MM/YYYY or fallback to today
+let parsedDate = new Date(invoiceDate);
+if (isNaN(parsedDate)) {
+  const parts = String(invoiceDate).split("/");
+  if (parts.length === 3) {
+    // Convert DD/MM/YYYY → YYYY-MM-DD
+    parsedDate = new Date(`${parts[2]}-${parts[1]}-${parts[0]}`);
+  } else {
+    parsedDate = new Date();
+  }
+}
+
+const newInvoice = new Invoice({
+  invoiceNumber,
+  invoiceDate: parsedDate,   // ✅ always valid Date
+  dueDate,
+  paymentTerms,
+  customerName,
+  customerPhone,
+  items: invoiceItems,
+  subtotal: subTotal,
+  totalDiscount,
+  totalTax: totalGST,
+  totalAmount: grandTotal,
+  totalProfit,
+  companyName,
+  companyAddress,
+  companyPhone,
+  companyLogo,
+});
+await newInvoice.save();
+
 
     // ===== Update product stock =====
     for (const item of invoiceItems) {
